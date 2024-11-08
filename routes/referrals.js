@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 
 // POST /update/referrals/:id
-router.post("/update/referrals/:id", async (req, res) => {
+router.post("/referrals/:id", async (req, res) => {
   const data = req.body;
   if (!data || !data.userID) {
     return res
