@@ -18,11 +18,11 @@ mongoose
 const userSchema = mongoose.Schema({
   userID: { type: Number, required: true },
   referralCount: { type: Number, default: 0 },
+  // typeId: { type: Number, required: true}
 });
 
 const User = mongoose.model("User", userSchema);
-const str1 = "22987";
-const str2 = "10001";
+
 
 // POST /users endpoint
 app.post("/users", async (req, res) => {
@@ -32,10 +32,14 @@ app.post("/users", async (req, res) => {
   }
 
   try {
-    const idKey = data.userID + str1 + data.userID + str2 + data.userID;
-    const saved = await new User({ userID: idKey, referralCount: 0 });
+    // const idKey = data.userID + str1 + data.userID + str2 + data.userID;
+    const targetUser = await User.findOne({ userID: data.userID})
+    // console.log(data.userID)
+    if (targetUser) {
+      return res.status(201).json({ message: targetUser});
+    }
+    const saved = await new User({ userID: data.userID, referralCount: 0 });
     await saved.save();
-
     res.status(201).json({ message: saved });
   } catch (error) {
     return res.status(500).send("Server error");
@@ -43,12 +47,9 @@ app.post("/users", async (req, res) => {
 });
 
 // POST /update/referrals/:id endpoint
-app.post("/update/referrals/:id", async (req, res) => {
-  const idKey = req.params.id;
-  console.log(idKey);
-
-  const data = req.body; // id = data.userID
-  if (!data || !data.userID) {
+app.post("/update/referrals/", async (req, res) => {
+  const {userID} = req.body; // id = data.userID
+  if (!userID) {
     return res
       .status(400)
       .json({ error: "Invalid data provided. 'userID' must be specified." });
@@ -56,16 +57,14 @@ app.post("/update/referrals/:id", async (req, res) => {
 
   try {
     const user = await User.findOneAndUpdate(
-      { userID: data.userID },
+      { userID: userID },
       { $inc: { referralCount: 1 } },
       { new: true }
     );
-
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    res.json(user);
+    res.json(user.referralCount);
   } catch (error) {
     console.log("Error in updating referral count:", error);
     res.status(500).json({ error: error.message });
