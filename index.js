@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors"); // Import CORS
+const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3333;
 const mongoose = require("mongoose");
