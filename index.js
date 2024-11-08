@@ -2,11 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3333;
 const mongoose = require("mongoose");
-const { encryptUserID, decryptUserID } = require("./cripto");
 
 app.use(express.json());
-// const secretKey = crypto.scryptSync('criptoSecret', 2, 32);
-// console.log(secretKey, 222);
 mongoose
   .connect("mongodb://localhost:27017/my-referal-tool")
   .then(() => {
