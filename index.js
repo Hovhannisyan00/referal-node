@@ -3,9 +3,19 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3333;
 const mongoose = require("mongoose");
+const nodemailer = require('nodemailer');
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
+
+var transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "7b2a563746f174",
+    pass: "8f3100359e086d"
+  }
+});
 
 // mongoose connection
 mongoose
@@ -45,6 +55,25 @@ app.post("/users", async (req, res) => {
     return res.status(500).send("Server error");
   }
 });
+
+app.post("/send/email", async (req, res) => {
+  const mailOptions = {
+    from: 'yourusername@email.com',
+    to: 'yourfriend@email.com',
+    subject: 'Sending Email using Node.js',
+    text: 'That was easy!'
+  };
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log('Error:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+
+  return res.status(200).json({ message: "Email send" });
+})
 
 // POST /update/referrals/:id endpoint
 app.post("/update/referrals/", async (req, res) => {
